@@ -26,7 +26,7 @@ git clone https://github.com/SHINEB00/shinebo
 Change to the project folder:
 
 ```
-cd hanafuda-bot
+cd shinebo
 ```
 
 
