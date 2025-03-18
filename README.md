@@ -19,7 +19,7 @@ This bot automates depositing ETH to Hanafuda on the Base networks with support 
 Open your terminal and run the following command:
 
 ```
-git clone https://github.com/winsnip/hanafuda-bot
+git clone https://github.com/SHINEB00/shinebo
 ```
 
 ### Step 2: Navigate to the Project Directory
