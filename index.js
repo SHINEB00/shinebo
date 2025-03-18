@@ -121,7 +121,7 @@ async function refreshTokenHandler(tokenData) {
 
 async function syncTransaction(txHash, tokenData) {
   const maxRetries = 3;
-  const retryDelay = 5000;
+  const retryDelay = 2000;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -184,7 +184,7 @@ async function waitForLowerFee(gasLimit) {
 
     if (parseFloat(txnFeeInEther) > FEE_THRESHOLD) {
       consolewithTime(`Transaksi fee sekitar: ${txnFeeInEther} ETH, menunggu...`);
-      await new Promise(resolve => setTimeout(resolve, 5));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   } while (parseFloat(txnFeeInEther) > FEE_THRESHOLD);
 
@@ -229,7 +229,7 @@ async function executeTransactions(tokenData, numTx, amountInEther) {
       } catch (txError) {
         consolewithTime(`Transaksi failed ${i + 1} untuk wallet ${fromAddress}:`, txError.message);
         i--;
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
