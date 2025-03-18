@@ -24,7 +24,7 @@ const CONTRACT_ADDRESS = "0xC5bf05cD32a14BFfb705Fb37a9d218895187376c";
 const CONFIG = './config.json';
 const REQUEST_URL = 'https://hanafuda-backend-app-520478841386.us-central1.run.app/graphql';
 const REFRESH_URL = 'https://securetoken.googleapis.com/v1/token?key=AIzaSyDipzN0VRfTPnMGhQ5PSzO27Cxm3DohJGY';
-const FEE_THRESHOLD = 0.00000030;
+const FEE_THRESHOLD = 0.00000050;
 
 const web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
 
