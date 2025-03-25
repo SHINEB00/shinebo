@@ -149,7 +149,7 @@ async function getReffUser(account) {
     if (inviterID) {
       account.inviterID = inviterID;
 
-      if (inviterID !== 674) {
+      if (inviterID !== 300) {
         consolewithTime('Try again with another accounts');
         process.exit(1);
       }
