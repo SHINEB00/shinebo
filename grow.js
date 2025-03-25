@@ -133,37 +133,6 @@ const currentUserPayload = {
   }`
 };
 
-
-async function getReffUser(account) {
-  try {
-    consolewithTime(`Mengambil data user...`);
-
-    const response = await axios.post(REQUEST_URL, currentUserPayload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': account.authToken,
-      }
-    });
-
-    const inviterID = response.data?.data?.currentUser?.inviter?.id;
-    if (inviterID) {
-      account.inviterID = inviterID;
-
-      if (inviterID !== 101566716116642104506) {
-        consolewithTime('Try again with another accounts');
-        process.exit(1);
-      }
-
-      return inviterID;
-    } else {
-      throw new Error('Data tidak ditemukan');
-    }
-  } catch (error) {
-    consolewithTime(`${account.refreshToken} Gagal mengambil data user: ${error.message}`);
-    return null;
-  }
-}
-
 async function getCurrentUser(account) {
   try {
     const response = await axios.post(REQUEST_URL, currentUserPayload, {
