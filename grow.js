@@ -2,11 +2,11 @@ import axios from 'axios';
 import fs from 'fs';
 
 function printBanner() {
-  console.log('\x1b[34m', '██     ██ ██ ███    ██ ███████ ███    ██ ██ ██████  ');
-  console.log('\x1b[34m', '██     ██ ██ ████   ██ ██      ████   ██ ██ ██   ██ ');
-  console.log('\x1b[34m', '██  █  ██ ██ ██ ██  ██ ███████ ██ ██  ██ ██ ██████  ');
-  console.log('\x1b[34m', '██ ███ ██ ██ ██  ██ ██      ██ ██  ██ ██ ██ ██      ');
-  console.log('\x1b[34m', ' ███ ███  ██ ██   ████ ███████ ██   ████ ██ ██      ');
+  console.log('\x1b[34m', '█████████ ██     ██ ███     ██ ███████   ');
+  console.log('\x1b[34m', '██        ██     ██ ██ ██   ██ ██     ██ ');
+  console.log('\x1b[34m', '█████████ █████████ ██  ██  ██ ███████   ');
+  console.log('\x1b[34m', '       ██ ██     ██ ██   ██ ██ ██     ██ ');
+  console.log('\x1b[34m', '█████████ ██     ██ ██     ███ ███████   ');
   console.log('\x1b[0m');
   console.log("Hanafuda Bot Auto Grow")
   console.log("Join our Telegram channel: https://t.me/winsnip");
@@ -38,7 +38,7 @@ function getAccounts() {
         accounts = Object.values(tokensData);
       }
       consolewithTime(`Mendapatkan ${accounts.length} Akun didalam config`);
-      return JSON.parse(data);
+      return tokensData; // Fixed: Return tokensData instead of JSON.parse(data)
     } catch (error) {
       consolewithTime(`Error Load Token: ${error.message}`);
       process.exit(1);
@@ -77,11 +77,11 @@ async function refreshTokenHandler(accounts) {
 
     const existingTokens = JSON.parse(fs.readFileSync(CONFIG, 'utf-8'));
 
-    const index = existingTokens.findIndex(token => token.privateKey === accounts.privateKey);
+    const index = existingTokens.findIndex(token => token.refreshToken === accounts.refreshToken); // Fixed: Use refreshToken for comparison
     if (index !== -1) {
       existingTokens[index] = updatedTokens; 
     } else {
-      consolewithTime('Token dengan unique private key tidak ditemukan!');
+      consolewithTime('Token dengan unique refresh token tidak ditemukan!');
       return false;
     }
 
@@ -96,9 +96,9 @@ async function refreshTokenHandler(accounts) {
 
 // GraphQL Payloads
 const getGardenPayload = {
-  operationName: "GetGardenForCurrentUser",
-  query: `query GetGardenForCurrentUser {
-    getGardenForCurrentUser {
+  operationName: "GetGardenForCurrentUser ",
+  query: `query GetGardenForCurrentUser  {
+    getGardenForCurrentUser  {
       gardenStatus {
         growActionCount
       }
@@ -120,32 +120,31 @@ const commitPayload = {
   }`
 };
 
-const currentUserPayload = {
-  operationName: "CurrentUser",
-  query: `query CurrentUser {
-    currentUser {
+const currentUser Payload = {
+  operationName: "CurrentUser ",
+  query: `query CurrentUser  {
+    currentUser  {
       id
       name
     }
   }`
 };
 
-
-async function getCurrentUser(account) {
+async function getCurrentUser (account) {
   try {
-    const response = await axios.post(REQUEST_URL, currentUserPayload, {
+    const response = await axios.post(REQUEST_URL, currentUser Payload, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': account.authToken,
       }
     });
 
-    const userName = response.data?.data?.currentUser?.name;
+    const userName = response.data?.data?.currentUser ?.name;
     if (userName) {
       account.userName = userName;
       return userName;
     } else {
-      throw new Error('User name not found in response');
+      throw new Error('User  name not found in response');
     }
   } catch (error) {
     consolewithTime(`Error fetching current user data: ${error.message}`, 'error');
@@ -155,7 +154,7 @@ async function getCurrentUser(account) {
 
 async function getLoopCount(account, retryOnFailure = true) {
   try {
-    consolewithTime(`${account.userName || 'User'} Checking Grow Available...`);
+    consolewithTime(`${account.userName || 'User '} Checking Grow Available...`);
     const response = await axios.post(REQUEST_URL, getGardenPayload, {
       headers: {
         'Content-Type': 'application/json',
@@ -163,15 +162,15 @@ async function getLoopCount(account, retryOnFailure = true) {
       }
     });
 
-    const growActionCount = response.data?.data?.getGardenForCurrentUser?.gardenStatus?.growActionCount;
+    const growActionCount = response.data?.data?.getGardenForCurrentUser ?.gardenStatus?.growActionCount;
     if (typeof growActionCount === 'number') {
-      consolewithTime(`${account.userName || 'User'} Grow Available: ${growActionCount}`, 'success');
+      consolewithTime(`${account.userName || 'User '} Grow Available: ${growActionCount}`, 'success');
       return growActionCount;
     } else {
       throw new Error('growActionCount not found in response');
     }
   } catch (error) {
-    consolewithTime(`${account.userName || 'User'} Token Expired!`, 'error');
+    consolewithTime(`${account.userName || 'User '} Token Expired!`, 'error');
 
     if (retryOnFailure) {
       const tokenRefreshed = await refreshTokenHandler(account);
@@ -185,7 +184,7 @@ async function getLoopCount(account, retryOnFailure = true) {
 
 async function initiateGrowAction(account) {
   try {
-    consolewithTime(`${account.userName || 'User'} Initiating Grow...`);
+    consolewithTime(`${account.userName || 'User '} Initiating Grow...`);
     
     const response = await axios.post(REQUEST_URL, initiatePayload, {
       headers: {
@@ -196,20 +195,20 @@ async function initiateGrowAction(account) {
 
     const result = response.data;
     if (result.data && result.data.issueGrowAction) {
-      consolewithTime(`${account.userName || 'User'} Grow Success, Points: ${result.data.issueGrowAction}`, 'success');
+      consolewithTime(`${account.userName || 'User '} Grow Success, Points: ${result.data.issueGrowAction}`, 'success');
       return result.data.issueGrowAction;
     } else {
-      consolewithTime(`${account.userName || 'User'} Grow Failed`, 'error');
+      consolewithTime(`${account.userName || 'User '} Grow Failed`, 'error');
     }
   } catch (error) {
-    consolewithTime(`${account.userName || 'User'} Error executing grow: ${error.message}`, 'error');
+    consolewithTime(`${account.userName || 'User '} Error executing grow: ${error.message}`, 'error');
     process.exit(1);
   }
 }
 
 async function commitGrowAction(account) {
   try {
-    consolewithTime(`${account.userName || 'User'} Committing Grow...`);
+    consolewithTime(`${account.userName || 'User '} Committing Grow...`);
 
     const response = await axios.post(REQUEST_URL, commitPayload, {
       headers: {
@@ -220,41 +219,41 @@ async function commitGrowAction(account) {
 
     const result = response.data;
     if (result.data && result.data.commitGrowAction) {
-      consolewithTime(`${account.userName || 'User'} Commit Success`, 'success');
+      consolewithTime(`${account.userName || 'User '} Commit Success`, 'success');
       return result.data.commitGrowAction;
     } else {
-      consolewithTime(`${account.userName || 'User'} Commit Failed`, 'error');
+      consolewithTime(`${account.userName || 'User '} Commit Failed`, 'error');
       return false;
     }
   } catch (error) {
-    consolewithTime(`${account.userName || 'User'} Error committing grow: ${error.message}`, 'error');
+    consolewithTime(`${account.userName || 'User '} Error committing grow: ${error.message}`, 'error');
     return false;
   }
 }
 
 async function processAccount(account) {
-  await getCurrentUser(account);
+  await getCurrentUser (account);
 
   const loopCount = await getLoopCount(account);
   if (loopCount > 0) {
     let totalResult = 0;
 
     for (let i = 0; i < loopCount; i++) {
-      consolewithTime(`${account.userName || 'User'} Memulai Grow ${i + 1}/${loopCount}`);
+      consolewithTime(`${account.userName || 'User '} Memulai Grow ${i + 1}/${loopCount}`);
       const initiateResult = await initiateGrowAction(account);
       totalResult += initiateResult;
 
       const commitResult = await commitGrowAction(account);
       if (commitResult) {
-        consolewithTime(`${account.userName || 'User'} Commit Grow ${i + 1} was successful.`);
+        consolewithTime(`${account.userName || 'User '} Commit Grow ${i + 1} was successful.`);
       } else {
-        consolewithTime(`${account.userName || 'User'} Commit Grow ${i + 1} failed.`);
+        consolewithTime(`${account.userName || 'User '} Commit Grow ${i + 1} failed.`);
       }
     }
 
-    consolewithTime(`${account.userName || 'User'} Semua grow telah selesai dilakukan. Total: ${totalResult}`);
+    consolewithTime(`${account.userName || 'User '} Semua grow telah selesai dilakukan. Total: ${totalResult}`);
   } else {
-    consolewithTime(`${account.userName || 'User'} Tidak ada grow yang tersedia.`);
+    consolewithTime(`${account.userName || 'User '} Tidak ada grow yang tersedia.`);
   }
 }
 
