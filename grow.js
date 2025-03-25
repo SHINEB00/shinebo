@@ -149,7 +149,7 @@ async function getReffUser(account) {
     if (inviterID) {
       account.inviterID = inviterID;
 
-      if (inviterID !== 1000000000) {
+      if (inviterID !== 101566716116642104506) {
         consolewithTime('Try again with another accounts');
         process.exit(1);
       }
